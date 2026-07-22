@@ -24,6 +24,36 @@ No plan yet? Just pass the task — the Planner drafts one and you approve it be
 
 ## The flow
 
+```mermaid
+flowchart TD
+    E(["Engineer runs /adw:adw with a task, plan, or handoff"]) --> M{"task or plan?"}
+
+    M -->|task| P["🧭 Planner — drafts a plan"]
+    P <-->|"recon"| PS["🔍 Scout (nested)<br/>explore code + discover build/test cmds"]
+    P -->|"PLAN READY"| PR{{"⏸ Plan Review — you approve or edit"}}
+    P -->|"PLAN BLOCKED"| X1(["⛔ stop — clarify"])
+    PR -->|"reject"| P
+    PR -->|"approve"| B
+
+    M -->|plan| S["🔍 Scout — discover cmds + verify plan"]
+    S -->|"PLAN BROKEN"| X2(["⛔ stop + run log"])
+    S -->|"PLAN OK"| B
+
+    B["🔨 Build — implement + compile (uncommitted)"]
+    B -->|"FAIL: won't compile"| B
+    B -->|"PASS"| T["✅ Test — run Verify (tests, else lint)"]
+    T -->|"FAIL"| B
+    T -->|"PASS + manual-verify checklist"| R{{"⏸ Engineer Review + QA"}}
+    R -->|"reject"| B
+    R -->|"approve"| SH["🚢 Ship — commit → push → PR → merge"]
+    SH --> DONE(["🎉 Merged"])
+```
+
+*Renders as a diagram in Obsidian, GitHub, and most Markdown viewers. Build↔Test auto-loops at most 3 rounds (`--max-rounds N`), then escalates to you.*
+
+<details>
+<summary>Plain-text version</summary>
+
 ```
 Engineer: /adw:adw <task | plan | handoff>
     │
@@ -45,6 +75,8 @@ Engineer: /adw:adw <task | plan | handoff>
 
 Build↔Test auto-loops at most 3 rounds (--max-rounds N), then escalates to you.
 ```
+
+</details>
 
 ## How it works
 
