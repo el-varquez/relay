@@ -77,7 +77,7 @@ Build↔Test auto-loops at most 3 rounds (--max-rounds N), then escalates to you
 ## Credits
 
 - Inspired by [IndyDevDan](https://www.youtube.com/@indydevdan)'s **Agentic Developer Workflow (ADW)** concept.
-- **Contributors:** el-varquez · [Claude Code](https://claude.com/claude-code)
+- **Contributors:** el-varquez
 
 ## License
 
