@@ -25,56 +25,41 @@ No plan yet? Just pass the task — the Planner drafts one and you approve it be
 ## The flow
 
 ```mermaid
-flowchart TD
-    E(["Engineer runs /adw:adw with a task, plan, or handoff"]) --> M{"task or plan?"}
+flowchart LR
+    E(["Engineer: /adw:adw (task | plan | handoff)"]) --> M{"task or plan?"}
 
-    M -->|task| P["🧭 Planner — drafts a plan"]
-    P <-->|"recon"| PS["🔍 Scout (nested)<br/>explore code + discover build/test cmds"]
-    P -->|"PLAN READY"| PR{{"⏸ Plan Review — you approve or edit"}}
-    P -->|"PLAN BLOCKED"| X1(["⛔ stop — clarify"])
+    M -->|task| P["🧭 Planner (adw-plan)"]
+    P -->|"sub-agent"| PS["🔍 Scout (adw-scout)<br/>recon"]
+    PS -->|"context pack"| P
+    P -->|"PLAN READY"| PR{{"⏸ Plan Review (you)"}}
+    P -->|"PLAN BLOCKED"| X(["⛔ clarify"])
     PR -->|"reject"| P
     PR -->|"approve"| B
 
-    M -->|plan| S["🔍 Scout — discover cmds + verify plan"]
-    S -->|"PLAN BROKEN"| X2(["⛔ stop + run log"])
+    M -->|plan| S["🔍 Scout (adw-scout)<br/>verify plan"]
     S -->|"PLAN OK"| B
+    S -->|"PLAN BROKEN"| P
 
-    B["🔨 Build — implement + compile (uncommitted)"]
-    B -->|"FAIL: won't compile"| B
-    B -->|"PASS"| T["✅ Test — run Verify (tests, else lint)"]
+    B["🔨 Build (adw-build)<br/>implement + compile"] -->|"PASS"| T["✅ Test (adw-test)<br/>tests + lint"]
     T -->|"FAIL"| B
-    T -->|"PASS + manual-verify checklist"| R{{"⏸ Engineer Review + QA"}}
+    T -->|"PASS"| R{{"⏸ Engineer Review + QA (you)"}}
     R -->|"reject"| B
-    R -->|"approve"| SH["🚢 Ship — commit → push → PR → merge"]
+    R -->|"approve"| SH["🚢 Ship (orchestrator)<br/>commit → push → PR → merge"]
     SH --> DONE(["🎉 Merged"])
 ```
 
-*Renders as a diagram in Obsidian, GitHub, and most Markdown viewers. Build↔Test auto-loops at most 3 rounds (`--max-rounds N`), then escalates to you.*
+*Renders as a diagram in Obsidian, GitHub, and most Markdown viewers. `adw-scout` appears twice — it's one agent in two roles: verifying a handed plan, or reconning for the Planner. A broken handed-plan is re-planned by the Planner. Build↔Test loops at most 3 rounds (`--max-rounds N`), then escalates to you.*
 
 <details>
 <summary>Plain-text version</summary>
 
-```
-Engineer: /adw:adw <task | plan | handoff>
-    │
-    │  task?  → 🧭 PLANNER  recons via nested 🔍 Scout → drafts a plan
-    │             → ⏸ PLAN REVIEW  (you approve / edit the plan) ──┐
-    │  plan?  → 🔍 SCOUT  read-only · discover cmds + verify plan ──┤
-    │             PLAN BROKEN → stop + run log                      │
-    ▼                                                               ▼
-🔨 BUILD   the only writer · implement + compile · leaves edits uncommitted   ◀─┐  fail: loop back
-    │  PASS                                                                      │  (same agent)
-    ▼                                                                            │
-✅ TEST    read-only · run plan's Verify (tests, else compile+lint) ────────────┘
-    │  PASS (+ manual-verify checklist)
-    ▼
-⏸  ENGINEER REVIEW + QA   QA runs the checklist here · approve = QA + Eng sign-off
-    │  approve                          reject(reason) → loop back to Build
-    ▼
-🚢 SHIP    commit → push → PR → merge (per the project's git rules)
-
-Build↔Test auto-loops at most 3 rounds (--max-rounds N), then escalates to you.
-```
+- **Engineer** runs `/adw:adw` with a task, plan, or handoff.
+- **task** → **Planner** (`adw-plan`) spawns the **Scout** (`adw-scout`) sub-agent to recon, then drafts a plan → you approve/edit it at **Plan Review** (or the Planner reports it's blocked → you clarify).
+- **plan / handoff** → **Scout** (`adw-scout`) verifies it → *PLAN OK* continues; *PLAN BROKEN* hands it to the **Planner** to re-plan.
+- **Build** (`adw-build`) implements + compiles → **Test** (`adw-test`) runs tests + lint.
+- Test fail → back to Build. Test pass → **Engineer Review + QA** (you). Reject → back to Build.
+- Approve → **Ship** (orchestrator): commit → push → PR → merge.
+- Build↔Test loops at most 3 rounds (`--max-rounds N`), then escalates to you.
 
 </details>
 

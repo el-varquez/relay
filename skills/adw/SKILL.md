@@ -35,9 +35,10 @@ Dispatch subagents with the **Agent/Task** tool (`subagent_type: "adw:adw-plan" 
 
 ## 2. Scout  (PLAN MODE only — prep + plan verification)
 - Dispatch `adw:adw-scout` with the plan path.
-- `VERDICT: PLAN BROKEN` → STOP, show the plan problems, write a run log (§6), ask the Engineer
-  to fix the plan. Do not proceed.
-- `VERDICT: PLAN OK` → keep the **context pack** for Build.
+- `VERDICT: PLAN BROKEN` → the handed plan is stale/unactionable, so **re-plan immediately**:
+  go to §1 (Plan), passing the plan's goal as the task + the plan problems as context. The Planner
+  drafts a fresh plan and the plan-review gate catches it. (No stop / run log for this.)
+- `VERDICT: PLAN OK` → keep the **context pack** for Build (§3).
 - (For a trivial plan you MAY inline these checks instead of dispatching a full Scout.)
 
 ## 3. Build ↔ Test loop  (cap = max-rounds)
