@@ -1,0 +1,11 @@
+{
+  "name": "adw",
+  "owner": { "name": "elvarquez" },
+  "plugins": [
+    {
+      "name": "adw",
+      "source": "./",
+      "description": "AI Development Workflow — Scout → Build → Test → Engineer Review → Ship."
+    }
+  ]
+}

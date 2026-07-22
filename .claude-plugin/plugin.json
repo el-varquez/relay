@@ -1,0 +1,11 @@
+{
+  "name": "adw",
+  "displayName": "ADW — AI Development Workflow",
+  "version": "1.0.0",
+  "description": "Drive an approved plan or handoff through Scout → Build → Test → Engineer Review → Ship, auto-looping on failure. Project-agnostic — reads each project's own CLAUDE.md to learn how it builds.",
+  "author": { "name": "elvarquez" },
+  "homepage": "https://github.com/elvarquez/adw",
+  "repository": "https://github.com/elvarquez/adw",
+  "license": "MIT",
+  "keywords": ["workflow", "pipeline", "agents", "orchestration", "build", "test"]
+}
