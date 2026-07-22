@@ -1,6 +1,6 @@
 ---
 name: adw
-description: Drive an approved plan or handoff through the ADW pipeline — Scout → Build → Test → Engineer Review → Ship, auto-looping on failure. Use when the user runs /adw <plan-or-handoff>, or asks to build/implement/ship an existing plan or handoff through the ADW workflow.
+description: Drive an approved plan or handoff through the ADW pipeline — Scout → Build → Test → Engineer Review → Ship, auto-looping on failure. Use when the user runs /adw:adw <plan-or-handoff>, or asks to build/implement/ship an existing plan or handoff through the ADW workflow.
 ---
 
 # ADW — AI Development Workflow (orchestrator)

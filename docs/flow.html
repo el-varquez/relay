@@ -364,7 +364,7 @@
         <div class="glyph">🧑‍💻</div>
         <div>
           <div class="n-label">Engineer <span class="role-pill">start</span></div>
-          <p class="n-desc">Runs <code>/adw &lt;plan | handoff&gt;</code> from inside a project. The orchestrator (your session) coordinates the agents and holds the one human gate.</p>
+          <p class="n-desc">Runs <code>/adw:adw &lt;plan | handoff&gt;</code> from inside a project. The orchestrator (your session) coordinates the agents and holds the one human gate.</p>
         </div>
       </div>
 
@@ -478,8 +478,8 @@
 <span class="p">$</span> /plugin install <span class="a">adw@adw</span>
 
 <span class="c"># then, from inside any project</span>
-<span class="p">$</span> /adw <span class="a">path/to/your-plan.md</span>
-<span class="p">$</span> /adw <span class="a">&lt;plan-or-handoff&gt;</span> --max-rounds 5   <span class="c"># widen the loop cap</span></pre>
+<span class="p">$</span> /adw:adw <span class="a">path/to/your-plan.md</span>
+<span class="p">$</span> /adw:adw <span class="a">&lt;plan-or-handoff&gt;</span> --max-rounds 5   <span class="c"># widen the loop cap</span></pre>
     </div>
   </section>
 
@@ -491,7 +491,7 @@
 <pre><span class="dir">adw/</span>  <span class="cm"># the plugin repo (also its own marketplace)</span>
   <span class="dir">.claude-plugin/</span>plugin.json  marketplace.json
   <span class="dir">skills/adw/</span>
-    SKILL.md                        <span class="cm"># the orchestrator (/adw runs this)</span>
+    SKILL.md                        <span class="cm"># the orchestrator (/adw:adw runs this)</span>
     references/detecting-build-commands.md   <span class="cm"># discover cmds per project</span>
   <span class="dir">agents/</span>
     adw-scout.md                    <span class="cm"># read-only prep + plan verification</span>

@@ -15,8 +15,8 @@ project builds and tests.
 Then, from inside any project:
 
 ```
-/adw <path-to-plan-or-handoff>            # e.g. /adw path/to/your-plan.md
-/adw <path-to-plan-or-handoff> --max-rounds 5
+/adw:adw <path-to-plan-or-handoff>            # e.g. /adw:adw path/to/your-plan.md
+/adw:adw <path-to-plan-or-handoff> --max-rounds 5
 ```
 
 No plan yet? Brainstorm and write one first, then feed it in.
@@ -24,7 +24,7 @@ No plan yet? Brainstorm and write one first, then feed it in.
 ## The flow
 
 ```
-Engineer: /adw <plan|handoff>
+Engineer: /adw:adw <plan|handoff>
     │
     ▼
 🔍 SCOUT   read-only · discover build/test/lint cmds + verify plan vs code
