@@ -8,7 +8,7 @@ project builds and tests.
 ## Install
 
 ```
-/plugin marketplace add elvarquez/adw
+/plugin marketplace add el-varquez/adw
 /plugin install adw@adw
 ```
 
@@ -76,4 +76,4 @@ Build↔Test auto-loops at most 3 rounds (--max-rounds N), then escalates to you
 
 ## License
 
-MIT © 2026 elvarquez
+MIT © 2026 el-varquez
