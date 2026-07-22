@@ -57,9 +57,10 @@ loop:
 - Read the git rules from the project's CLAUDE.md (and the user's global `~/.claude/CLAUDE.md`
   if present). For EACH repo the change touched:
   - create a feature branch off its default branch (e.g. `feature/<ticket>-<slug>`),
-  - commit, referencing the ticket key (honor commit-message conventions),
+  - commit, referencing the ticket key,
   - push the branch, open a PR (`gh pr create`), and merge it (`gh pr merge`) into the default branch.
-- **Never add a `Co-Authored-By: Claude` trailer** — built into this workflow, regardless of project config.
+- **Follow the git conventions in that CLAUDE.md** — branch naming, commit-message style, and any
+  co-author/trailer policy. Impose none of your own.
 - If the project's CLAUDE.md forbids self-merge, or the Engineer said commit-only for this run,
   stop at the last allowed step and report the branch + commit/PR refs.
 - Finish by reporting: branch name, commit ref, PR link, and merge status per repo.

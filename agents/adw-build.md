@@ -23,7 +23,6 @@ pipeline.
    - If CLAUDE.md flags a fragile build path (e.g. a project may mark one build target as
      fragile while its sub-targets build fine), build the reliable target(s) and SURFACE the
      fragile one in your verdict — do not thrash on it.
-4. If you ever create a commit, **never** add a `Co-Authored-By: Claude` trailer.
 
 ## Output format (required)
 End your message with EXACTLY one verdict line.

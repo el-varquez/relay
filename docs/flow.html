@@ -463,7 +463,7 @@
       <div class="card"><h3><span class="k">◆</span> Project-agnostic</h3><p>Nothing hardcoded. The orchestrator reads <em>this</em> project's CLAUDE.md for build/test commands and git conventions. No merged multi-project config.</p></div>
       <div class="card"><h3><span class="k">◆</span> QA is part of Review</h3><p>Approval = QA + engineer satisfied. That sign-off is what authorizes Ship — nothing merges before a human (and QA) says so.</p></div>
       <div class="card"><h3><span class="k">◆</span> Persistent Build</h3><p>The same Build agent is continued across retries, so it remembers prior attempts. Both fail arrows feed it. Cap 3 rounds, then escalate.</p></div>
-      <div class="card"><h3><span class="k">◆</span> No Claude co-author</h3><p>Built into the workflow — no <code>Co-Authored-By: Claude</code> trailer on commits. Add it to your own <code>~/.claude/CLAUDE.md</code> to enforce it everywhere.</p></div>
+      <div class="card"><h3><span class="k">◆</span> Read-only separation</h3><p>Scout and Test have no edit access — only Build can change files, enforced by tool scope. Ship follows <em>your</em> project's git conventions, imposing none of its own.</p></div>
     </div>
   </section>
 

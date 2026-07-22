@@ -69,10 +69,15 @@ Build↔Test auto-loops at most 3 rounds (--max-rounds N), then escalates to you
 
 ## Notes
 
-- **Commits carry no `Co-Authored-By: Claude` trailer** — built into the workflow. Want that
-  rule everywhere (even for hand-made commits)? Add it to your own `~/.claude/CLAUDE.md`.
 - **Run logs** land in `./.adw/runs/<date>-<slug>.md` per project.
+- **Git conventions** (branch naming, commit-message style, co-author trailers) follow *your*
+  project or global `CLAUDE.md` — the workflow imposes none of its own.
 - Requires Claude Code with plugin support.
+
+## Credits
+
+- Inspired by [IndyDevDan](https://www.youtube.com/@indydevdan)'s **Agentic Developer Workflow (ADW)** concept.
+- **Contributors:** el-varquez · [Claude Code](https://claude.com/claude-code)
 
 ## License
 
