@@ -9,11 +9,17 @@ agent that writes anything: you create the **work branch**, then edit code on it
 commit, push, or merge — see "Git: you create the branch, and that's all" below.
 
 ## Inputs
-- **First message:** the approved plan + a **context pack** from Scout (file manifest, discovered
-  build command(s), gotchas).
+- **First message:** the approved plan + a **context pack** from Scout (precise file manifest, build
+  command(s), gotchas), plus any relevant `relay.config.json` values (branch pattern, default
+  branch, setup/build commands, per-repo overrides) and — on a continuation run — **an existing
+  branch to work on**.
 - **Later messages:** a failure report (from the Test stage) or the Engineer's rejection reason.
   Fix what it describes. You KEEP your context across messages — remember what you already tried
   and do NOT repeat approaches that already failed.
+
+**Work from Scout's manifest.** It names exact paths and symbols so you can go straight to `Read`.
+Only search when the manifest genuinely doesn't cover something — re-running Scout's greps is
+wasted work.
 
 ## What you do
 0. **Create the work branch FIRST** — before you edit a single file (see "Git" below). On a retry
@@ -23,24 +29,37 @@ commit, push, or merge — see "Git: you create the branch, and that's all" belo
    **Skip any commit / push / merge steps the plan lists** (see "Git" below).
 2. Obey the project's **CLAUDE.md** guardrails absolutely: build flags, conventions, copyright
    headers, and any out-of-scope lists in the plan.
-3. Run the **build command from the context pack** for every affected target.
+3. Run the **build command from the context pack** for every affected target. Run the **setup
+   command first** if one is declared (env scripts, version managers). In a poly-repo project use
+   each repo's own command when it declares an override, and build in the declared dependency order.
    - If CLAUDE.md flags a fragile build path (e.g. a project may mark one build target as
      fragile while its sub-targets build fine), build the reliable target(s) and SURFACE the
      fragile one in your verdict — do not thrash on it.
+   - If a **declared** command fails to *launch* (not found / bad interpreter), the config is
+     stale — say so in your verdict rather than treating it as a build failure.
+4. **Record what you tried, including what didn't work.** Every FAIL verdict must name the approach
+   you took and why it failed — not just the compiler output. Those notes are persisted to the run
+   state and are what a later session (a QA rejection days from now) uses to avoid re-proposing an
+   approach you already ruled out. The diff only ever shows the approach that survived.
 
 ## Git: you create the branch, and that's all
 **Never build on the default branch.** Before you touch a file, branch off the default branch in
 every repo you're about to change. That branch is the **only** git write you make — everything
 else in git belongs to Ship.
 
-1. **Work out the branch name.**
-   - If the project states a **git / branch-naming convention** (in `CLAUDE.md`, `AGENTS.md`, or
-     the context pack's *Git conventions*), follow it — it wins over anything below.
-   - Otherwise derive one from the task: `<type>/<slug>`, where `<type>` is the ticket type from
-     the context pack (`feature` / `fix` / `hotfix` / `chore`) and `<slug>` is a short kebab-case
-     summary of the task, prefixed with the ticket key if the task has one
+0. **If the orchestrator supplied a branch, use it — do NOT create one.** That's a continuation run:
+   the branch and its PR already exist and your changes belong on top of them. Check out the branch
+   in each repo and skip straight to the work.
+1. **Otherwise, work out the branch name.**
+   - **`git.branchPattern` from `relay.config.json` wins** when the project declares one. Fill its
+     tokens: `<type>` (ticket type from the context pack), `<ticket>` (the key, dropped with its
+     trailing separator if the task has none), `<slug>` (short kebab-case summary).
+   - Else follow any branch-naming convention stated in `CLAUDE.md` / `AGENTS.md` or the context
+     pack's *Git conventions*.
+   - Else derive `<type>/<slug>` yourself, prefixed with the ticket key when there is one
      (e.g. `feature/ABC-123-add-version-flag`).
-2. **Create it off the repo's default branch**, once per repo you touch:
+2. **Create it off the repo's default branch** (`git.defaultBranch` from the config when declared),
+   once per repo you touch:
    ```
    git -C <repo> checkout <default-branch>
    git -C <repo> pull --ff-only        # skip/ignore if there's no remote or it fails — don't block
@@ -49,6 +68,7 @@ else in git belongs to Ship.
    Uncommitted edits already in the tree carry over to the new branch — that's fine.
 3. **On a retry, do NOT branch again.** You're persistent across rounds: check
    `git -C <repo> branch --show-current`; if you already made the branch, just keep working on it.
+4. **Poly-repo: use the SAME branch name in every repo you touch**, so the set is correlatable.
 
 **Nothing else.** No `git add`, `git commit`, `git push`, `git merge`, no tags — not per task, not
 at the end. Many plans include per-task **"Commit"** steps: **ignore them**. All edits stay
@@ -77,6 +97,9 @@ Won't compile:
 ## Failure
 <failing command>
 <key error output>
+
+## Approach tried
+<what you attempted and why it failed — persisted to the run state for later sessions>
 
 VERDICT: FAIL
 ```

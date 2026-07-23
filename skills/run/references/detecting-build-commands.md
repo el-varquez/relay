@@ -6,7 +6,11 @@ a confident answer; fall through only when it doesn't.
 
 ## Priority order
 
-1. **`./CLAUDE.md` or `./AGENTS.md`** (primary). Well-run repos document exact commands. Read
+0. **`./relay.config.json`** (authoritative when present). Any command declared under `commands`
+   is the answer — do **not** re-derive it, and do not second-guess it against CLAUDE.md. Discover
+   only the keys the config leaves out. See `relay-config.md`. *(If a declared command later fails
+   to launch, the config is stale: fall back to the steps below and say so.)*
+1. **`./CLAUDE.md` or `./AGENTS.md`**. Well-run repos document exact commands. Read
    them and extract the build / test / lint invocations verbatim, including any required
    environment setup and platform/config flags.
 2. **Any plan or spec doc's "Verify" / "Build" section.** If such a doc names the commands to run
@@ -14,6 +18,9 @@ a confident answer; fall through only when it doesn't.
 3. **Ecosystem heuristics** (below), inferred from files present in the repo.
 4. **Unresolved → report it.** If none of the above yields a confident command set, say so in
    the verdict so the orchestrator can ask the Engineer. Never guess.
+
+If you fell through to 2–4 for commands a config could have declared, say so — it's a hint the
+project should run `/relay:init`.
 
 ## Ecosystem heuristics
 
