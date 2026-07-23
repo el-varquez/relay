@@ -33,7 +33,7 @@ flowchart LR
     P -->|"PLAN BLOCKED"| X(["⛔ clarify"])
     P -->|"PLAN READY"| PR{{"⏸ Plan Review (you)"}}
     PR -->|"reject / questions"| P
-    PR -->|"approve"| B["🔨 Build (relay:build)<br/>implement + compile"]
+    PR -->|"approve"| B["🔨 Build (relay:build)<br/>branch → implement → compile"]
     B -->|"PASS"| T["✅ Test (relay:test)<br/>tests + lint"]
     T -->|"FAIL"| B
     T -->|"PASS"| R{{"⏸ Engineer Review + QA (you)"}}
@@ -49,7 +49,7 @@ flowchart LR
 
 - **Engineer** runs `/relay:run "<task>"`.
 - **Planner** (`relay:plan`) reads the project's `CLAUDE.md`, spawns the **Scout** (`relay:scout`) sub-agent to recon the code, then drafts a lean plan → you approve/edit it at **Plan Review**. If it has open questions it asks first (via `grill-me` if installed) until you share understanding; if the task is truly infeasible it reports blocked.
-- **Build** (`relay:build`) implements + compiles → **Test** (`relay:test`) runs tests + lint.
+- **Build** (`relay:build`) branches off the default branch, implements there + compiles → **Test** (`relay:test`) runs tests + lint.
 - Test fail → back to Build. Test pass → **Engineer Review + QA** (you). Reject → back to Build.
 - Approve → **Ship** (orchestrator): commit → push → PR → merge.
 - Build↔Test loops until Test passes (it only pauses for you if Build genuinely stalls).
@@ -76,8 +76,12 @@ flowchart LR
 - **Persistent Build.** The Build agent is continued across retries, so it remembers prior
   attempts. Both fail loop-backs feed it. It loops Build↔Test until green — pausing only if it
   genuinely stalls.
-- **Nothing commits until Ship.** Build only edits the working tree — it never commits, branches,
-  or pushes. All changes are committed once, at Ship, after Engineer + QA approval.
+- **Never builds on your default branch.** Build's one git write is the **work branch**: it branches
+  off the default branch before editing, named by your project's convention if it states one,
+  otherwise derived from the task (`feature/ABC-123-short-slug`).
+- **Nothing commits until Ship.** Build only edits the working tree — it never commits, pushes, or
+  merges. All changes are committed once, at Ship, on the branch Build made, after Engineer + QA
+  approval.
 
 ## Stages
 
@@ -85,7 +89,7 @@ flowchart LR
 |-------|---------|-----|-------------|
 | Plan | no | Planner reads CLAUDE.md, recons via Scout, drafts a lean plan; asks questions until aligned | you + Planner share understanding of the approach |
 | Scout | no | recon sub-agent — explores code + discovers build/test/lint cmds for the Planner | context pack → `RECON DONE` |
-| Build | yes | implement the plan, then compile | clean compile → `PASS` |
+| Build | yes | branch off the default branch, implement the plan there, then compile | clean compile → `PASS` |
 | Test  | no | run the plan's Verify — tests + lint | every gate green → `PASS` |
 | Review| — | the mandatory human gate; QA tests here | you approve with QA sign-off |
 | Ship  | git | commit → push → PR → merge | merged |
@@ -93,8 +97,9 @@ flowchart LR
 ## Notes
 
 - **Run logs** land in `./.relay/runs/<date>-<slug>.md` per project.
-- **Git conventions** (branch naming, commit-message style, co-author trailers) follow *your*
-  project or global `CLAUDE.md` — the workflow imposes none of its own.
+- **Git conventions** follow *your* project or global `CLAUDE.md` — the workflow imposes none of
+  its own. Build reads the **branch naming** rule; Ship reads **commit-message style** and any
+  co-author/trailer policy.
 - Requires Claude Code with plugin support.
 
 ## Credits

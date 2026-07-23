@@ -42,7 +42,8 @@ Ship) will execute. You do **not** write code and you do **not** touch git — y
 - A one-line **Goal**, a short **Architecture** note, and the discovered **Build / Test / Lint** commands.
 - **Numbered steps**, each naming exact files and the change to make.
 - A **Verify** section describing how the change is checked.
-- **No commit/branch/push steps** — Relay commits exactly once, later, at Ship.
+- **No git steps at all** — no branch step (Build creates the work branch itself) and no
+  commit/push/merge steps (Relay commits exactly once, later, at Ship).
 
 ## Output format (required)
 Return the full plan as markdown, then end with EXACTLY one verdict line.

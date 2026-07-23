@@ -56,30 +56,38 @@ loop:                                          # no round cap — keep passing t
     if test verdict == PASS: break             # -> Engineer Review
     SendMessage(build, "Tests failed:\n<output>\nFix and rebuild.")   # loop until PASS
 ```
+- **Build creates the work branch — you do not.** Include the project's **git / branch-naming
+  convention** (from its CLAUDE.md) in the Build dispatch prompt; if the project states none, Build
+  derives a branch from the task. Build branches off the default branch *before* editing, works
+  there, and reports the branch name(s) in its verdict — carry those to §3 and §4. Never create a
+  branch yourself, and never let a run build on the default branch.
 - **No round cap.** The relay keeps looping Build ↔ Test until Test is green — that's the point.
 - **Safety valve (not a cap):** only pause and hand off to the Engineer if Build genuinely stalls —
   the *same* failure repeats with no progress, or Build finds the **plan itself** is wrong/unworkable.
   Write a run log (§5) and escalate. This trips only on a real dead-end; normal runs loop freely.
 
 ## 3. Engineer Review + QA  (mandatory human gate — QA tests here)
-- Show a compact summary: the files Build changed — these are **uncommitted** working-tree edits,
-  so use `git -C <repo> status --short` + `git -C <repo> diff --stat` per touched repo — plus the
-  Build result, Test result, and the **manual-verify checklist** (if any), which is what QA runs here.
+- Show a compact summary: the **work branch** Build created per repo, and the files it changed —
+  these are **uncommitted** edits on that branch, so use `git -C <repo> status --short` +
+  `git -C <repo> diff --stat` per touched repo — plus the Build result, Test result, and the
+  **manual-verify checklist** (if any), which is what QA runs here.
 - Ask the Engineer: approve (with QA sign-off), or reject with a reason.
   - **Reject(reason)** → `SendMessage(build, "<reason>")`, `round += 1`, re-enter the Build↔Test loop.
   - **Approve** → Ship (§4). Approval = QA + Engineer satisfied, and authorizes commit → PR → merge.
 
 ## 4. Ship  (only after Review approval)
-**This is the ONLY place anything is committed.** Build left every edit uncommitted in the working
-tree; nothing has been committed until now.
+**This is the ONLY place anything is committed.** Build already created the work branch and left
+every edit uncommitted on it; nothing has been committed until now.
 - Read the git rules from the project's CLAUDE.md (and the user's global `~/.claude/CLAUDE.md`
   if present). For EACH repo the change touched:
-  - create a feature branch off its default branch (e.g. `feature/<ticket>-<slug>`),
+  - **confirm the branch** Build reported (`git -C <repo> branch --show-current`) — do NOT create
+    one. Only if a repo somehow sits on its default branch, branch now (project convention, else
+    `<type>/<slug>`) before staging anything,
   - stage the accumulated changes and make a **single commit** (or a small logical set),
     referencing the ticket key,
   - push the branch, open a PR (`gh pr create`), and merge it (`gh pr merge`) into the default branch.
-- **Follow the git conventions in that CLAUDE.md** — branch naming, commit-message style, and any
-  co-author/trailer policy. Impose none of your own.
+- **Follow the git conventions in that CLAUDE.md** — commit-message style and any co-author/trailer
+  policy. Impose none of your own.
 - If the project's CLAUDE.md forbids self-merge, or the Engineer said commit-only for this run,
   stop at the last allowed step and report the branch + commit/PR refs.
 - Finish by reporting: branch name, commit ref, PR link, and merge status per repo.

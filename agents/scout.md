@@ -16,7 +16,9 @@ A **task** to recon (from the Planner).
    `${CLAUDE_PLUGIN_ROOT}/skills/run/references/detecting-build-commands.md` (read it first). When
    you read `./CLAUDE.md` / `./AGENTS.md`, also capture the project's **conventions & guardrails**
    (domain language, architecture rules, "must-follow" constraints) that a plan must respect — not
-   just the commands. Detect the **ticket type** (bug / feature / hotfix / chore) from the task.
+   just the commands — and its **git conventions** (branch naming, default branch, commit-message
+   style), which Build needs to name the work branch. Detect the **ticket type**
+   (bug / feature / hotfix / chore) from the task.
 2. **Explore** the code areas relevant to the task — the files/symbols a plan would likely touch.
 3. **Emit a context pack** the Planner grounds its plan in.
 
@@ -33,6 +35,7 @@ End your message with EXACTLY one verdict line.
 - Env setup: <command(s) or "none">
 - File manifest: <code areas / files / symbols relevant to the task>
 - Conventions & guardrails: <key must-follow rules from CLAUDE.md/AGENTS.md, or "none">
+- Git conventions: <branch naming + default branch per repo; commit style; or "none stated">
 - Gotchas: <fragile build paths etc., or "none">
 
 VERDICT: RECON DONE
