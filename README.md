@@ -28,9 +28,11 @@ flowchart LR
     E(["Engineer: /relay:run (task)"]) --> P["🧭 Planner (relay:plan)"]
     P -->|"sub-agent"| PS["🔍 Scout (relay:scout)<br/>recon"]
     PS -->|"context pack"| P
+    P -->|"NEEDS CLARIFICATION"| Q(["❓ grill-me / ask<br/>→ shared understanding"])
+    Q --> P
     P -->|"PLAN BLOCKED"| X(["⛔ clarify"])
     P -->|"PLAN READY"| PR{{"⏸ Plan Review (you)"}}
-    PR -->|"reject"| P
+    PR -->|"reject / questions"| P
     PR -->|"approve"| B["🔨 Build (relay:build)<br/>implement + compile"]
     B -->|"PASS"| T["✅ Test (relay:test)<br/>tests + lint"]
     T -->|"FAIL"| B
@@ -46,7 +48,7 @@ flowchart LR
 <summary>Plain-text version</summary>
 
 - **Engineer** runs `/relay:run "<task>"`.
-- **Planner** (`relay:plan`) spawns the **Scout** (`relay:scout`) sub-agent to recon the code, then drafts a plan → you approve/edit it at **Plan Review** (or the Planner reports it's blocked → you clarify).
+- **Planner** (`relay:plan`) reads the project's `CLAUDE.md`, spawns the **Scout** (`relay:scout`) sub-agent to recon the code, then drafts a lean plan → you approve/edit it at **Plan Review**. If it has open questions it asks first (via `grill-me` if installed) until you share understanding; if the task is truly infeasible it reports blocked.
 - **Build** (`relay:build`) implements + compiles → **Test** (`relay:test`) runs tests + lint.
 - Test fail → back to Build. Test pass → **Engineer Review + QA** (you). Reject → back to Build.
 - Approve → **Ship** (orchestrator): commit → push → PR → merge.
@@ -56,9 +58,13 @@ flowchart LR
 
 ## How it works
 
-- **Task-driven.** Give Relay a task — the **Planner** (`relay:plan`) recons the code via its Scout
-  sub-agent (`relay:scout`) and drafts a grounded plan for you to approve before any building starts.
-  It uses `superpowers:writing-plans` if installed, otherwise plans plainly.
+- **Task-driven.** Give Relay a task — the **Planner** (`relay:plan`) reads the project's `CLAUDE.md`,
+  recons the code via its Scout sub-agent (`relay:scout`), and drafts a **lean**, grounded plan for
+  you to approve before any building starts. It works from the task's **subtasks** (which already
+  encode the acceptance criteria — so it won't re-ask about AC). If Scout's recon shows the scope
+  isn't easily implementable, it asks first — via `grill-me` if installed, otherwise plain questions
+  — to agree on **how** to implement. The bar to proceed is that shared understanding of the
+  approach, not a checklist that every criterion is covered.
 - **Project-agnostic.** Nothing is hardcoded. The orchestrator (your Claude Code session)
   reads *this* project's `CLAUDE.md` for build/test/lint commands and git conventions, then
   delegates to subagents.
@@ -77,7 +83,7 @@ flowchart LR
 
 | Stage | Writes? | Job | Passes when |
 |-------|---------|-----|-------------|
-| Plan | no | Planner turns your task into a grounded plan (recons via Scout) | you approve the plan |
+| Plan | no | Planner reads CLAUDE.md, recons via Scout, drafts a lean plan; asks questions until aligned | you + Planner share understanding of the approach |
 | Scout | no | recon sub-agent — explores code + discovers build/test/lint cmds for the Planner | context pack → `RECON DONE` |
 | Build | yes | implement the plan, then compile | clean compile → `PASS` |
 | Test  | no | run the plan's Verify — tests + lint | every gate green → `PASS` |

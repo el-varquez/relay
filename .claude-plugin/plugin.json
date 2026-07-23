@@ -1,7 +1,7 @@
 {
   "name": "relay",
   "displayName": "Relay",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Give it a task; a relay of agents plans it (you approve), then builds, tests, and ships — Plan → Build → Test → Engineer Review → Ship, auto-looping on failure. Project-agnostic — reads each project's own CLAUDE.md.",
   "author": { "name": "el-varquez" },
   "homepage": "https://github.com/el-varquez/relay",

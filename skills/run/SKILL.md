@@ -20,13 +20,26 @@ final `VERDICT:` line to branch.
   on an existing plan/spec/doc, mention that file's path in the task and the Planner will read it.
 
 ## 1. Plan
-- **Detect planning skills:** scan your available skills for plan-generating ones (e.g.
-  `superpowers:writing-plans`, `to-prd`). Collect their names (may be none).
-- Dispatch `relay:plan` with the task + the detected skill names. The Planner recons via its
-  Scout sub-agent (`relay:scout`) and returns a plan.
+- **Pass project context to the Planner.** You (the orchestrator) have this project's `CLAUDE.md`
+  loaded; the Planner subagent does NOT inherit it. Put a short digest of the project's CLAUDE.md
+  (build/run rules, key conventions, guardrails) — and its path — in the dispatch prompt so the plan
+  honors it.
+- **Detect a questioning skill:** note whether `grill-me` is among your available skills (used below
+  to reach shared understanding).
+- Dispatch `relay:plan` with the task + the CLAUDE.md digest. The Planner reads the project's
+  CLAUDE.md/AGENTS.md, recons via its Scout sub-agent (`relay:scout`), and returns a plan.
   - `VERDICT: PLAN BLOCKED` → STOP, show the blockers, ask the Engineer to clarify. Do not proceed.
+  - `VERDICT: PLAN NEEDS CLARIFICATION` → the Planner has open questions. **Reach shared
+    understanding with the Engineer:** if `grill-me` is available, invoke it to work through the
+    questions; otherwise ask them directly. Keep going until you and the Engineer are aligned, then
+    **re-dispatch `relay:plan`** with the answers. Repeat until `PLAN READY`.
   - `VERDICT: PLAN READY` → save the plan to `./.relay/plans/<YYYY-MM-DD>-<slug>.md`.
-- **⏸ PLAN-REVIEW gate (human):** show the Engineer the saved plan. Ask: approve, edit, or reject.
+- **⏸ PLAN-REVIEW gate (human):** show the Engineer the saved plan. The bar is **a shared
+  understanding of HOW to implement** — the task's subtasks are the scope; don't re-derive what to
+  build or gate on ticking off every acceptance criterion.
+  Ask: approve, edit, or raise questions.
+  - **Questions / not yet aligned** → run `grill-me` (if available, else ask directly) until you and
+    the Engineer share understanding, then apply edits or re-dispatch the Planner.
   - **Edit** → apply their edits to the plan file (or re-dispatch the Planner with the feedback).
   - **Reject(reason)** → re-dispatch the Planner with the reason.
   - **Approve** → continue to §2 (Build↔Test). The Planner's context pack (build/test/lint commands)

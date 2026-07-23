@@ -13,8 +13,10 @@ A **task** to recon (from the Planner).
 
 ## Your job
 1. **Discover** how THIS project builds, tests, and lints. Follow the procedure in
-   `${CLAUDE_PLUGIN_ROOT}/skills/run/references/detecting-build-commands.md` (read it first).
-   Also detect the **ticket type** (bug / feature / hotfix / chore) from the task.
+   `${CLAUDE_PLUGIN_ROOT}/skills/run/references/detecting-build-commands.md` (read it first). When
+   you read `./CLAUDE.md` / `./AGENTS.md`, also capture the project's **conventions & guardrails**
+   (domain language, architecture rules, "must-follow" constraints) that a plan must respect — not
+   just the commands. Detect the **ticket type** (bug / feature / hotfix / chore) from the task.
 2. **Explore** the code areas relevant to the task — the files/symbols a plan would likely touch.
 3. **Emit a context pack** the Planner grounds its plan in.
 
@@ -30,7 +32,8 @@ End your message with EXACTLY one verdict line.
 - Lint/typecheck: <command(s)>
 - Env setup: <command(s) or "none">
 - File manifest: <code areas / files / symbols relevant to the task>
-- Gotchas: <from CLAUDE.md, or "none">
+- Conventions & guardrails: <key must-follow rules from CLAUDE.md/AGENTS.md, or "none">
+- Gotchas: <fragile build paths etc., or "none">
 
 VERDICT: RECON DONE
 ```
